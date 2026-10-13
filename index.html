@@ -83,8 +83,9 @@ const PLACED = [
   ["Prisha Aggarwal", "Sagility"],
   ["Jhanvi Baghlal", "Eli Lilly"]
 ];
-/* 3. OPTIONAL: Google Sheet published CSV link (leave empty to use the list above). */
-const SHEET_CSV_URL = (window.SIP_CONFIG && window.SIP_CONFIG.SHEET_CSV_URL) || localStorage.getItem('sip_sheet_csv_url') || "";
+/* 3. Google Sheet published CSV link */
+const HARDCODED_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSB054tmb3Lv2CCHpfbRAhd5QHKzUz2JxLrt9eVVHfkG81U_9TLh1n3kGDjOM66yZXV3ONIX97DSHtq/pub?output=csv";
+const SHEET_CSV_URL = (window.SIP_CONFIG && window.SIP_CONFIG.SHEET_CSV_URL) || HARDCODED_CSV_URL;
 /* ====== END EDIT ====== */
 
 const grid=document.getElementById('grid'),spot=document.getElementById('spot');

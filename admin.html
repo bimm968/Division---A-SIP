@@ -908,13 +908,13 @@ header.admin-nav {
 
         <div class="form-group">
           <label for="cfgScriptUrl">Google Apps Script Web App URL (For Submitting)</label>
-          <input type="url" id="cfgScriptUrl" class="form-input" placeholder="https://script.google.com/macros/s/.../exec">
+          <input type="url" id="cfgScriptUrl" class="form-input" value="https://script.google.com/macros/s/AKfycbyTvDxFWPTs7u2GUjbtTTYwNlPBi1eCG6jZhnbe5ciO7QTjoAbthsErIx8wYU547Fda7A/exec" placeholder="https://script.google.com/macros/s/.../exec">
           <div class="input-hint">The admin form submits new rows directly to this endpoint.</div>
         </div>
 
         <div class="form-group">
           <label for="cfgCsvUrl">Google Sheet Published CSV URL (For Reading)</label>
-          <input type="url" id="cfgCsvUrl" class="form-input" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+          <input type="url" id="cfgCsvUrl" class="form-input" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vSB054tmb3Lv2CCHpfbRAhd5QHKzUz2JxLrt9eVVHfkG81U_9TLh1n3kGDjOM66yZXV3ONIX97DSHtq/pub?output=csv" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
           <div class="input-hint">The public celebration page and this admin panel read live data from this link.</div>
         </div>
 
@@ -1049,13 +1049,16 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+const HARDCODED_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSB054tmb3Lv2CCHpfbRAhd5QHKzUz2JxLrt9eVVHfkG81U_9TLh1n3kGDjOM66yZXV3ONIX97DSHtq/pub?output=csv";
+const HARDCODED_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTvDxFWPTs7u2GUjbtTTYwNlPBi1eCG6jZhnbe5ciO7QTjoAbthsErIx8wYU547Fda7A/exec";
+
 /* ====================================================================
    DASHBOARD INITIALIZATION & DATA MANAGEMENT
    ==================================================================== */
 function initDashboard() {
-  // Load configured URLs from config.js or localStorage
-  const savedCsv = (window.SIP_CONFIG && window.SIP_CONFIG.SHEET_CSV_URL) || localStorage.getItem('sip_sheet_csv_url') || "";
-  const savedScript = (window.SIP_CONFIG && window.SIP_CONFIG.APPS_SCRIPT_URL) || localStorage.getItem('sip_apps_script_url') || "";
+  // Load configured URLs from config.js, localStorage, or hardcoded defaults
+  const savedCsv = (window.SIP_CONFIG && window.SIP_CONFIG.SHEET_CSV_URL) || localStorage.getItem('sip_sheet_csv_url') || HARDCODED_CSV_URL;
+  const savedScript = (window.SIP_CONFIG && window.SIP_CONFIG.APPS_SCRIPT_URL) || localStorage.getItem('sip_apps_script_url') || HARDCODED_SCRIPT_URL;
   
   document.getElementById('cfgCsvUrl').value = savedCsv;
   document.getElementById('cfgScriptUrl').value = savedScript;
@@ -1240,7 +1243,7 @@ async function handleAddPlacement(e) {
   btn.disabled = true;
   btn.innerHTML = '<span>⏳ Saving Placement...</span>';
 
-  const scriptUrl = document.getElementById('cfgScriptUrl').value.trim();
+  const scriptUrl = document.getElementById('cfgScriptUrl').value.trim() || HARDCODED_SCRIPT_URL;
 
   try {
     if (scriptUrl) {
