@@ -859,6 +859,11 @@ header.admin-nav {
           <button type="submit" class="submit-btn" id="submitBtn">
             <span>✨ Announce & Add Placement</span>
           </button>
+          <div style="margin-top: 12px; text-align: center;">
+            <button type="button" onclick="copyUpdatedArray()" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.82rem; padding: 10px;">
+              📋 Copy Placements Array (Backup / Manual Code Sync)
+            </button>
+          </div>
         </form>
       </section>
 
@@ -1259,18 +1264,36 @@ async function handleAddPlacement(e) {
     // Refresh display
     renderPlacements(PLACED_DATA);
     triggerConfetti();
-    showToast(`🎉 ${name} (${company}) announced successfully!`);
+
+    if (scriptUrl) {
+      showToast(`🎉 ${name} (${company}) saved to Google Sheets!`);
+    } else {
+      showToast(`🎉 ${name} saved on this device! Connect Google Sheets below for live worldwide sync.`);
+    }
 
   } catch (err) {
     console.error("Submission error:", err);
-    // Still save locally as fallback
     PLACED_DATA.push([name, company]);
+    localStorage.setItem('sip_local_placements', JSON.stringify(PLACED_DATA));
     renderPlacements(PLACED_DATA);
-    showToast(`Saved locally! (Note: Could not reach Google Sheet)`);
+    showToast(`Saved locally on this device.`);
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<span>✨ Announce & Add Placement</span>';
     nameInput.focus();
+  }
+}
+
+function copyUpdatedArray() {
+  const code = 'const PLACED = ' + JSON.stringify(PLACED_DATA, null, 2) + ';';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => {
+      showToast("📋 Copied placements code! You can paste it into index.html");
+    }).catch(() => {
+      prompt("Copy the updated PLACED code:", code);
+    });
+  } else {
+    prompt("Copy the updated PLACED code:", code);
   }
 }
 

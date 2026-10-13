@@ -128,11 +128,43 @@ function render(list){
 }
 
 async function load(){
-  if(!SHEET_CSV_URL){render(PLACED);return}
+  if(!SHEET_CSV_URL){
+    try {
+      const saved = localStorage.getItem('sip_local_placements');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          render(parsed);
+          return;
+        }
+      }
+    } catch(e){}
+    render(PLACED);
+    return;
+  }
   try{
     const res=await fetch(SHEET_CSV_URL+(SHEET_CSV_URL.includes('?')?'&':'?')+'t='+Date.now());
-    render(parseCSV(await res.text()).slice(1).filter(r=>r[0]&&r[0].trim()));
-  }catch(e){if(shown===-1)render(PLACED)}
+    const parsedRows = parseCSV(await res.text()).slice(1).filter(r=>r[0]&&r[0].trim());
+    if(parsedRows.length > 0) {
+      render(parsedRows);
+    } else {
+      render(PLACED);
+    }
+  }catch(e){
+    if(shown===-1){
+      try {
+        const saved = localStorage.getItem('sip_local_placements');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            render(parsed);
+            return;
+          }
+        }
+      } catch(err){}
+      render(PLACED);
+    }
+  }
 }
 load();
 if(SHEET_CSV_URL)setInterval(load,60000);
