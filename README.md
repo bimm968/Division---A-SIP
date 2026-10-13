@@ -22,8 +22,8 @@ This repository hosts the live placement celebration board and the coordinator a
 
 | Coordinator | Profile | Default PIN | Default Passcode |
 | :--- | :--- | :--- | :--- |
-| **Mitali Sachdev** | `MS` | `8921` | `mitali2026` |
-| **Bimleshwar Prasad** | `BP` | `3412` | `bimlesh2026` |
+| **Mitali Sachdev** | `MS` | `1234` | `mitali2026` |
+| **Bimleshwar Prasad** | `BP` | `1234` | `bimlesh2026` |
 
 > [!NOTE]
 > All credentials are validated via browser SHA-256 cryptographic hashing.
