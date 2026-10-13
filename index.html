@@ -67,6 +67,7 @@ footer{text-align:center;color:var(--muted);padding:0 20px 44px;font-size:.95rem
 </main>
 <footer>Not on the list yet? Your moment is coming. Cheering for you. 💛</footer>
 
+<script src="config.js"></script>
 <script>
 /* ====== EDIT HERE ======
    1. Total students in the division:  */
@@ -83,7 +84,7 @@ const PLACED = [
   ["Jhanvi Baghlal", "Eli Lilly"]
 ];
 /* 3. OPTIONAL: Google Sheet published CSV link (leave empty to use the list above). */
-const SHEET_CSV_URL = "";
+const SHEET_CSV_URL = (window.SIP_CONFIG && window.SIP_CONFIG.SHEET_CSV_URL) || localStorage.getItem('sip_sheet_csv_url') || "";
 /* ====== END EDIT ====== */
 
 const grid=document.getElementById('grid'),spot=document.getElementById('spot');

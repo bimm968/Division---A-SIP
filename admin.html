@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin Portal • Division A SIP Placements</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b1222;
+  --card: #16203a;
+  --card-hover: #1b2746;
+  --ink: #f3efe4;
+  --muted: #a3adc4;
+  --gold: #c9962b;
+  --gold2: #f0d27a;
+  --navy: #0f1b36;
+  --navy2: #1d2f5c;
+  --line: #2a3658;
+  --success: #2ec4b6;
+  --danger: #e71d36;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Background ambient glow */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 20%;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(201,150,43,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Auth Overlay / Modal */
+#authGate {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(29,47,92,0.9), rgba(11,18,34,0.98));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.auth-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(201,150,43,0.15);
+  border-radius: 24px;
+  max-width: 460px;
+  width: 100%;
+  padding: 36px 32px;
+  text-align: center;
+  animation: fadeIn 0.4s ease-out;
+  position: relative;
+}
+
+.auth-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  background: rgba(201,150,43,0.15);
+  border: 1px solid rgba(240,210,122,0.4);
+  padding: 5px 14px;
+  border-radius: 99px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.auth-card h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem;
+  margin: 0 0 8px;
+  color: #fff;
+}
+
+.auth-card h1 span {
+  background: linear-gradient(90deg, var(--gold2), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.auth-card p.sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 28px;
+  line-height: 1.45;
+}
+
+.user-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.user-btn {
+  background: rgba(15, 27, 54, 0.7);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 10px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-btn:hover {
+  border-color: rgba(201,150,43,0.6);
+  background: rgba(29, 47, 92, 0.6);
+}
+
+.user-btn.active {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(29,47,92,0.9), rgba(15,27,54,0.9));
+  box-shadow: 0 0 20px rgba(201,150,43,0.3);
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), #a77616);
+  color: #fff;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: var(--gold2);
+}
+
+.pin-field {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.pin-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pin-input-wrap {
+  position: relative;
+}
+
+.pin-input {
+  width: 100%;
+  background: rgba(11, 18, 34, 0.8);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #fff;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.pin-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,150,43,0.25);
+}
+
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  color: var(--navy);
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+  box-shadow: 0 8px 24px rgba(201,150,43,0.3);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(201,150,43,0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.auth-error {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 12px;
+  min-height: 20px;
+  display: none;
+}
+
+.shake {
+  animation: shake 0.35s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Main Dashboard (Hidden before auth) */
+#dashboard {
+  display: none;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+header.admin-nav {
+  background: rgba(15, 27, 54, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 14px 24px;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-brand-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.nav-brand-title span {
+  color: var(--gold2);
+}
+
+.nav-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.active-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(29, 47, 92, 0.6);
+  border: 1px solid var(--line);
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.85rem;
+}
+
+.user-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2ec4b6;
+  box-shadow: 0 0 8px #2ec4b6;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-secondary {
+  background: rgba(29, 47, 92, 0.6);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(42, 54, 88, 0.9);
+  border-color: var(--gold);
+}
+
+.btn-logout {
+  background: rgba(231, 29, 54, 0.15);
+  border: 1px solid rgba(231, 29, 54, 0.3);
+  color: #ff8a98;
+}
+
+.btn-logout:hover {
+  background: rgba(231, 29, 54, 0.25);
+  border-color: #ff6b6b;
+}
+
+/* Dashboard Body */
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  width: 100%;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  opacity: 0.7;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--gold2);
+  line-height: 1;
+}
+
+.stat-sub {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* Grid Layout for Forms and Lists */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 960px) {
+  .admin-grid { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.panel-header {
+  margin-bottom: 22px;
+}
+
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.45rem;
+  margin: 0 0 6px;
+  color: #fff;
+}
+
+.panel-desc {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(11, 18, 34, 0.7);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 13px 16px;
+  color: #fff;
+  font-size: 0.98rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,150,43,0.2);
+}
+
+.form-input::placeholder {
+  color: #55627e;
+}
+
+.input-hint {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  color: var(--navy);
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 1.02rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(201,150,43,0.3);
+  transition: all 0.2s;
+}
+
+.submit-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(201,150,43,0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Placements List & Table */
+.list-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  background: rgba(11, 18, 34, 0.7);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 0.9rem;
+  width: 240px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--gold);
+}
+
+.items-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 540px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.items-feed::-webkit-scrollbar {
+  width: 6px;
+}
+.items-feed::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 10px;
+}
+
+.placement-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: rgba(15, 27, 54, 0.6);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition: all 0.2s;
+}
+
+.placement-item:hover {
+  background: var(--card-hover);
+  border-color: rgba(201,150,43,0.4);
+  transform: translateX(3px);
+}
+
+.placement-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.placement-av {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), #a77616);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex: none;
+}
+
+.placement-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.placement-company {
+  font-size: 0.84rem;
+  color: var(--gold2);
+  margin-top: 2px;
+}
+
+.placement-meta {
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.placement-tag-new {
+  background: rgba(201,150,43,0.18);
+  border: 1px solid var(--gold);
+  color: var(--gold2);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+/* Settings / Google Sheets Accordion */
+.settings-section {
+  margin-top: 28px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 24px 28px;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  margin: 0;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.connected {
+  background: rgba(46, 196, 182, 0.15);
+  border: 1px solid #2ec4b6;
+  color: #2ec4b6;
+}
+
+.status-badge.local {
+  background: rgba(240, 210, 122, 0.15);
+  border: 1px solid var(--gold2);
+  color: var(--gold2);
+}
+
+.settings-body {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.instructions-box {
+  background: rgba(11, 18, 34, 0.8);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.instructions-box ol {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.instructions-box li {
+  margin-bottom: 6px;
+}
+
+.code-snippet {
+  background: #070d18;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  overflow-x: auto;
+  position: relative;
+  margin-top: 8px;
+}
+
+/* Toast alert */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--card);
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  padding: 16px 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 25px rgba(201,150,43,0.25);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 2000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+#toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Confetti styling */
+.cf {
+  position: fixed;
+  top: -12px;
+  width: 9px;
+  height: 14px;
+  opacity: 0.9;
+  animation: fall linear forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+@keyframes fall {
+  to { transform: translateY(105vh) rotate(720deg); }
+}
+</style>
+</head>
+<body>
+
+<!-- AUTHENTICATION GATE -->
+<div id="authGate">
+  <div class="auth-card" id="authCard">
+    <div class="auth-badge">Executive Access Only</div>
+    <h1>Placement <span>Admin Portal</span></h1>
+    <p class="sub">Authorized coordinators: <b>Mitali Sachdev</b> & <b>Bimleshwar Prasad</b>. Please select your profile and enter your PIN.</p>
+
+    <div class="user-selector">
+      <div class="user-btn active" id="btnMitali" onclick="selectUser('Mitali Sachdev', 'MS')">
+        <div class="user-avatar">MS</div>
+        <div class="user-name">Mitali Sachdev</div>
+        <div class="user-role">Coordinator</div>
+      </div>
+      <div class="user-btn" id="btnBimlesh" onclick="selectUser('Bimleshwar Prasad', 'BP')">
+        <div class="user-avatar">BP</div>
+        <div class="user-name">Bimleshwar Prasad</div>
+        <div class="user-role">Coordinator</div>
+      </div>
+    </div>
+
+    <form onsubmit="handleLogin(event)">
+      <div class="pin-field">
+        <label for="pinInput">Enter Secure PIN / Passcode</label>
+        <div class="pin-input-wrap">
+          <input type="password" id="pinInput" class="pin-input" placeholder="••••" autocomplete="current-password" autofocus required>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" id="loginSubmitBtn">Unlock Portal →</button>
+      <div class="auth-error" id="authError">Incorrect PIN. Please try again.</div>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD (Visible only after unlocking) -->
+<div id="dashboard">
+  <header class="admin-nav">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <h2 class="nav-brand-title">Division A • <span>Placement Console</span></h2>
+      </div>
+      
+      <div class="nav-user-badge">
+        <div class="active-user-pill">
+          <span class="user-dot"></span>
+          <span id="activeUserName">Mitali Sachdev</span>
+        </div>
+        <div class="nav-actions">
+          <a href="index.html" target="_blank" class="btn-secondary">👁 View Live Celebration Page</a>
+          <button onclick="handleLogout()" class="btn-secondary btn-logout">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-content">
+    <!-- Top KPI Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Placed</div>
+        <div class="stat-val" id="statPlaced">0</div>
+        <div class="stat-sub">out of <span id="statTotal">60</span> candidates</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Placement Rate</div>
+        <div class="stat-val" id="statRate">0%</div>
+        <div class="stat-sub">Division A progress</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Latest Placement</div>
+        <div class="stat-val" style="font-size: 1.4rem; margin-top: 4px;" id="statLatest">-</div>
+        <div class="stat-sub" id="statLatestCompany">Awaiting updates</div>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <!-- FORM: Add Placement -->
+      <section class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">✨ Add Placed Candidate</h3>
+          <p class="panel-desc">Submit newly placed candidates. They will appear on the live celebration board.</p>
+        </div>
+
+        <form id="addPlacementForm" onsubmit="handleAddPlacement(event)">
+          <div class="form-group">
+            <label for="candName">Candidate Full Name *</label>
+            <input type="text" id="candName" class="form-input" placeholder="e.g. Aditi Sharma" required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="candCompany">Company Name *</label>
+            <input type="text" id="candCompany" class="form-input" placeholder="e.g. Goldman Sachs, Crisil, MARSH" required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label>Added By</label>
+            <input type="text" id="addedByDisplay" class="form-input" style="opacity: 0.8; cursor: not-allowed;" readonly>
+            <div class="input-hint">Automatically signed with your coordinator profile.</div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span>✨ Announce & Add Placement</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- FEED: Placements List -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="list-controls">
+            <div>
+              <h3 class="panel-title" style="margin-bottom: 2px;">Placed Candidates</h3>
+              <p class="panel-desc">All confirmed placements in Division A</p>
+            </div>
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search candidate or company..." oninput="handleSearch()">
+          </div>
+        </div>
+
+        <div class="items-feed" id="itemsFeed">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+    </div>
+
+    <!-- SETTINGS: Google Sheets Integration -->
+    <div class="settings-section">
+      <div class="settings-header" onclick="toggleSettings()">
+        <h3>
+          ⚙️ Google Sheets Live Sync Configuration
+          <span class="status-badge local" id="statusBadge">🟡 Standalone / Fallback Mode</span>
+        </h3>
+        <span id="settingsToggleIcon" style="color: var(--gold2); font-size: 1.2rem;">▼</span>
+      </div>
+
+      <div class="settings-body" id="settingsBody" style="display: none;">
+        <div class="instructions-box">
+          <b>How live updates work with Google Sheets:</b>
+          <ol>
+            <li>Create a new Google Sheet at <a href="https://sheets.new" target="_blank" style="color: var(--gold2);">sheets.new</a> with columns: <code>Name</code> and <code>Company</code>.</li>
+            <li>In Google Sheets, go to <b>Extensions > Apps Script</b>, paste the code from <code>google-apps-script.js</code>, and click <b>Deploy > New deployment > Web app</b> (Access: Anyone).</li>
+            <li>Copy the <b>Web app URL</b> into the field below.</li>
+            <li>In Google Sheets, click <b>File > Share > Publish to web</b> > select <b>CSV</b> format > copy that CSV link below.</li>
+          </ol>
+        </div>
+
+        <div class="form-group">
+          <label for="cfgScriptUrl">Google Apps Script Web App URL (For Submitting)</label>
+          <input type="url" id="cfgScriptUrl" class="form-input" placeholder="https://script.google.com/macros/s/.../exec">
+          <div class="input-hint">The admin form submits new rows directly to this endpoint.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="cfgCsvUrl">Google Sheet Published CSV URL (For Reading)</label>
+          <input type="url" id="cfgCsvUrl" class="form-input" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+          <div class="input-hint">The public celebration page and this admin panel read live data from this link.</div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 14px;">
+          <button type="button" class="btn-primary" style="width: auto; padding: 12px 24px;" onclick="saveConfigUrls()">Save Sync Settings</button>
+          <button type="button" class="btn-secondary" onclick="loadFromCsv()">🔄 Refresh Live Data Now</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast">
+  <span style="font-size: 1.3rem;">🎉</span>
+  <span id="toastMsg">Placement recorded successfully!</span>
+</div>
+
+<script src="config.js"></script>
+<script>
+/* ====================================================================
+   AUTHORIZED USERS & SHA-256 CREDENTIALS
+   ====================================================================
+   Mitali Sachdev default PIN: 8921 (or passcode: mitali2026)
+   Bimleshwar Prasad default PIN: 3412 (or passcode: bimlesh2026)
+   ==================================================================== */
+const AUTH_PROFILES = {
+  "Mitali Sachdev": {
+    initials: "MS",
+    // SHA-256 hashes for '8921' and 'mitali2026'
+    hashes: [
+      "b1b9cbe9a6cf14eb105634eda9edd603fd35f77a8b5a3491db35524866eba532",
+      "ac56f3cc2104e89c659393f325b19b4e348d25044a6a0884c3d8c2f112f5dc52"
+    ]
+  },
+  "Bimleshwar Prasad": {
+    initials: "BP",
+    // SHA-256 hashes for '3412' and 'bimlesh2026'
+    hashes: [
+      "f23d089e7f2e05f6fe745bf632b49aa89d9b9abb01bfe905a9c6f64a554ae57e",
+      "a6051b4c3294a185d69727a5a6469f7a198b373f013a9d9d77dc487bd4e90a57"
+    ]
+  }
+};
+
+const TOTAL_STUDENTS = 60;
+// Fallback base list matching index.html
+let PLACED_DATA = [
+  ["Allen Sujith", "MARSH"],
+  ["Shivam Dutta", "Crisil"],
+  ["Yashaswitha A", "Gartner"],
+  ["Harshul Vashney", "Sagility"],
+  ["Prisha Aggarwal", "Sagility"],
+  ["Jhanvi Baghlal", "Eli Lilly"]
+];
+
+let selectedUser = "Mitali Sachdev";
+let currentUser = null;
+
+// SHA-256 helper using subtle crypto
+async function sha256(text) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text.trim());
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function selectUser(name, initials) {
+  selectedUser = name;
+  document.getElementById('btnMitali').classList.toggle('active', name === 'Mitali Sachdev');
+  document.getElementById('btnBimlesh').classList.toggle('active', name === 'Bimleshwar Prasad');
+  document.getElementById('pinInput').value = '';
+  document.getElementById('authError').style.display = 'none';
+  document.getElementById('pinInput').focus();
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const inputPin = document.getElementById('pinInput').value;
+  const hash = await sha256(inputPin);
+  const profile = AUTH_PROFILES[selectedUser];
+
+  // Also support custom user-changed PIN stored in localStorage
+  const customHashKey = 'custom_pin_hash_' + selectedUser;
+  const customHash = localStorage.getItem(customHashKey);
+
+  if (profile.hashes.includes(hash) || (customHash && customHash === hash)) {
+    // Authentication successful
+    currentUser = selectedUser;
+    sessionStorage.setItem('sip_admin_user', currentUser);
+    unlockDashboard();
+  } else {
+    // Authentication failed
+    const errorEl = document.getElementById('authError');
+    errorEl.textContent = 'Incorrect PIN for ' + selectedUser + '. Please try again.';
+    errorEl.style.display = 'block';
+    
+    const card = document.getElementById('authCard');
+    card.classList.remove('shake');
+    void card.offsetWidth; // trigger reflow
+    card.classList.add('shake');
+    document.getElementById('pinInput').select();
+  }
+}
+
+function unlockDashboard() {
+  document.getElementById('authGate').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('activeUserName').textContent = currentUser;
+  document.getElementById('addedByDisplay').value = currentUser;
+  
+  initDashboard();
+}
+
+function handleLogout() {
+  sessionStorage.removeItem('sip_admin_user');
+  currentUser = null;
+  document.getElementById('authGate').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('pinInput').value = '';
+}
+
+// Check session on load
+window.addEventListener('DOMContentLoaded', () => {
+  const savedUser = sessionStorage.getItem('sip_admin_user');
+  if (savedUser && AUTH_PROFILES[savedUser]) {
+    currentUser = savedUser;
+    unlockDashboard();
+  } else {
+    document.getElementById('pinInput').focus();
+  }
+});
+
+/* ====================================================================
+   DASHBOARD INITIALIZATION & DATA MANAGEMENT
+   ==================================================================== */
+function initDashboard() {
+  // Load configured URLs from config.js or localStorage
+  const savedCsv = (window.SIP_CONFIG && window.SIP_CONFIG.SHEET_CSV_URL) || localStorage.getItem('sip_sheet_csv_url') || "";
+  const savedScript = (window.SIP_CONFIG && window.SIP_CONFIG.APPS_SCRIPT_URL) || localStorage.getItem('sip_apps_script_url') || "";
+  
+  document.getElementById('cfgCsvUrl').value = savedCsv;
+  document.getElementById('cfgScriptUrl').value = savedScript;
+
+  updateSyncBadge(savedCsv, savedScript);
+
+  // If CSV URL is available, load from it; otherwise use default array
+  if (savedCsv) {
+    loadFromCsv();
+  } else {
+    // Check if any additional placements were cached locally
+    const localSaved = localStorage.getItem('sip_local_placements');
+    if (localSaved) {
+      try {
+        const parsed = JSON.parse(localSaved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          PLACED_DATA = parsed;
+        }
+      } catch (e) {}
+    }
+    renderPlacements(PLACED_DATA);
+  }
+}
+
+function updateSyncBadge(csv, script) {
+  const badge = document.getElementById('statusBadge');
+  if (csv && script) {
+    badge.className = 'status-badge connected';
+    badge.innerHTML = '🟢 Connected to Google Sheets';
+  } else {
+    badge.className = 'status-badge local';
+    badge.innerHTML = '🟡 Standalone / Fallback Mode';
+  }
+}
+
+function toggleSettings() {
+  const body = document.getElementById('settingsBody');
+  const icon = document.getElementById('settingsToggleIcon');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    icon.textContent = '▲';
+  } else {
+    body.style.display = 'none';
+    icon.textContent = '▼';
+  }
+}
+
+function saveConfigUrls() {
+  const csv = document.getElementById('cfgCsvUrl').value.trim();
+  const script = document.getElementById('cfgScriptUrl').value.trim();
+  
+  localStorage.setItem('sip_sheet_csv_url', csv);
+  localStorage.setItem('sip_apps_script_url', script);
+  
+  if (window.SIP_CONFIG) {
+    window.SIP_CONFIG.SHEET_CSV_URL = csv;
+    window.SIP_CONFIG.APPS_SCRIPT_URL = script;
+  }
+  
+  updateSyncBadge(csv, script);
+  showToast("Sync settings saved successfully!");
+  
+  if (csv) {
+    loadFromCsv();
+  }
+}
+
+// CSV Parser
+function parseCSV(t) {
+  const rows = []; let r = [], f = "", q = false;
+  for (let i = 0; i < t.length; i++) {
+    const ch = t[i];
+    if (q) {
+      if (ch == '"' && t[i + 1] == '"') { f += '"'; i++; }
+      else if (ch == '"') q = false;
+      else f += ch;
+    } else if (ch == '"') q = true;
+    else if (ch == ',') { r.push(f); f = ""; }
+    else if (ch == '\n') { r.push(f); rows.push(r); r = []; f = ""; }
+    else if (ch != '\r') f += ch;
+  }
+  if (f || r.length) { r.push(f); rows.push(r); }
+  return rows;
+}
+
+async function loadFromCsv() {
+  const csvUrl = document.getElementById('cfgCsvUrl').value.trim();
+  if (!csvUrl) return;
+
+  try {
+    const res = await fetch(csvUrl + (csvUrl.includes('?') ? '&' : '?') + 't=' + Date.now());
+    if (!res.ok) throw new Error("HTTP error " + res.status);
+    const text = await res.text();
+    const rows = parseCSV(text).slice(1).filter(r => r[0] && r[0].trim());
+    if (rows.length > 0) {
+      PLACED_DATA = rows.map(r => [r[0].trim(), (r[1] || "").trim()]);
+      renderPlacements(PLACED_DATA);
+      showToast("Updated " + rows.length + " placements from Google Sheet!");
+    }
+  } catch (err) {
+    console.warn("Could not load from CSV:", err);
+    renderPlacements(PLACED_DATA);
+  }
+}
+
+function renderPlacements(list) {
+  const feed = document.getElementById('itemsFeed');
+  const total = list.length;
+  
+  document.getElementById('statPlaced').textContent = total;
+  document.getElementById('statTotal').textContent = TOTAL_STUDENTS;
+  document.getElementById('statRate').textContent = Math.round((total / TOTAL_STUDENTS) * 100) + '%';
+  
+  if (total > 0) {
+    const newest = list[list.length - 1];
+    document.getElementById('statLatest').textContent = newest[0];
+    document.getElementById('statLatestCompany').textContent = newest[1];
+  } else {
+    document.getElementById('statLatest').textContent = '-';
+    document.getElementById('statLatestCompany').textContent = 'No records yet';
+  }
+
+  feed.innerHTML = '';
+  // Show in reverse order (newest on top)
+  const rev = [...list].reverse();
+  
+  rev.forEach((item, idx) => {
+    const name = item[0];
+    const company = item[1];
+    const initials = name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    
+    const div = document.createElement('div');
+    div.className = 'placement-item';
+    div.innerHTML = `
+      <div class="placement-info">
+        <div class="placement-av">${initials}</div>
+        <div>
+          <div class="placement-name">
+            ${escapeHtml(name)}
+            ${idx === 0 ? '<span class="placement-tag-new">Latest</span>' : ''}
+          </div>
+          <div class="placement-company">${escapeHtml(company)}</div>
+        </div>
+      </div>
+      <div class="placement-meta">
+        #${total - idx}
+      </div>
+    `;
+    feed.appendChild(div);
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function handleSearch() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const filtered = PLACED_DATA.filter(item => 
+    item[0].toLowerCase().includes(q) || item[1].toLowerCase().includes(q)
+  );
+  renderPlacements(filtered);
+}
+
+/* ====================================================================
+   SUBMIT NEW PLACEMENT
+   ==================================================================== */
+async function handleAddPlacement(e) {
+  e.preventDefault();
+  const nameInput = document.getElementById('candName');
+  const companyInput = document.getElementById('candCompany');
+  const btn = document.getElementById('submitBtn');
+
+  const name = nameInput.value.trim();
+  const company = companyInput.value.trim();
+  const addedBy = currentUser;
+
+  if (!name || !company) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳ Saving Placement...</span>';
+
+  const scriptUrl = document.getElementById('cfgScriptUrl').value.trim();
+
+  try {
+    if (scriptUrl) {
+      // Send to Google Apps Script Web App
+      await fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors', // standard for Google Apps Script to prevent preflight blocks
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ name, company, addedBy })
+      });
+    }
+
+    // Append to local list
+    PLACED_DATA.push([name, company]);
+    localStorage.setItem('sip_local_placements', JSON.stringify(PLACED_DATA));
+    
+    // Clear inputs
+    nameInput.value = '';
+    companyInput.value = '';
+    
+    // Refresh display
+    renderPlacements(PLACED_DATA);
+    triggerConfetti();
+    showToast(`🎉 ${name} (${company}) announced successfully!`);
+
+  } catch (err) {
+    console.error("Submission error:", err);
+    // Still save locally as fallback
+    PLACED_DATA.push([name, company]);
+    renderPlacements(PLACED_DATA);
+    showToast(`Saved locally! (Note: Could not reach Google Sheet)`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span>✨ Announce & Add Placement</span>';
+    nameInput.focus();
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+function triggerConfetti() {
+  const cols = ['#c9962b', '#f0d27a', '#14213d', '#2ec4b6', '#ffffff'];
+  for (let i = 0; i < 60; i++) {
+    const e = document.createElement('div');
+    e.className = 'cf';
+    e.style.left = Math.random() * 100 + 'vw';
+    e.style.background = cols[i % cols.length];
+    e.style.animationDuration = (2.2 + Math.random() * 2.5) + 's';
+    e.style.animationDelay = (Math.random() * 0.8) + 's';
+    document.body.appendChild(e);
+    setTimeout(() => e.remove(), 6000);
+  }
+}
+</script>
+</body>
+</html>
